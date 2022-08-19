@@ -50,3 +50,6 @@
     # Ignore CLI configuration files
     .terraformrc
     terraform.rc
+
+
+## Изменение урок 3
