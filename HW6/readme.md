@@ -22,7 +22,7 @@ Windows Terminal, в основном пользуюсь Putty.
 
 Пришлось помучаться с блокировкой нашей страны, но вопросы заданные ранее помогли.
 
-![](vagrant up.png)
+![](vagrant_up.png)
 
 #### Ознакомьтесь с графическим интерфейсом VirtualBox, посмотрите как выглядит виртуальная машина, которую создал для вас Vagrant, какие аппаратные ресурсы ей выделены. Какие ресурсы выделены по-умолчанию?
 
@@ -41,7 +41,7 @@ Windows Terminal, в основном пользуюсь Putty.
 
 #### Команда vagrant ssh из директории, в которой содержится Vagrantfile, позволит вам оказаться внутри виртуальной машины без каких-либо дополнительных настроек. Попрактикуйтесь в выполнении обсуждаемых команд в терминале Ubuntu.
 
-![](vagrant ssh2.png)
+![](vagrant_ssh2.png)
 
 #### Ознакомиться с разделами man bash, почитать о настройках самого bash:
 #### какой переменной можно задать длину журнала history, и на какой строчке manual это описывается?
@@ -84,18 +84,18 @@ Windows Terminal, в основном пользуюсь Putty.
 
 #### Основываясь на знаниях о просмотре текущих (например, PATH) и установке новых переменных; командах, которые мы рассматривали, добейтесь в выводе type -a bash в виртуальной машине наличия первым пунктом в списке:
 
-vagrant@vagrant:~$ mkdir /tmp/new_path_dir/
-vagrant@vagrant:~$ cp /bin/bash /tmp/new_path_dir/
-vagrant@vagrant:~$ PATH=/tmp/new_path_dir/:$PATH
-vagrant@vagrant:~$ type -a bash
-bash is /tmp/new_path_dir/bash
-bash is /usr/bin/bash
-bash is /bin/bash
+    vagrant@vagrant:~$ mkdir /tmp/new_path_dir/
+    vagrant@vagrant:~$ cp /bin/bash /tmp/new_path_dir/
+    vagrant@vagrant:~$ PATH=/tmp/new_path_dir/:$PATH
+    vagrant@vagrant:~$ type -a bash
+    bash is /tmp/new_path_dir/bash
+    bash is /usr/bin/bash
+    bash is /bin/bash
 
 #### Чем отличается планирование команд с помощью batch и at?
 Тогда как cron используется для назначения повторяющихся задач, команда at используется для назначения одноразового задания на заданное время, а команда batch — для назначения одноразовых задач, которые должны выполняться, когда загрузка системы становится меньше 1.5.
 
 #### Завершите работу виртуальной машины чтобы не расходовать ресурсы компьютера и/или батарею ноутбука.
 
-vagrant halt
+    vagrant halt
 
