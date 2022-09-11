@@ -1,0 +1,86 @@
+
+
+
+node_cpu_seconds_total{cpu="0",mode="idle"} 1530.46
+node_cpu_seconds_total{cpu="0",mode="system"} 1.68
+node_cpu_seconds_total{cpu="0",mode="user"} 0.86
+
+
+node_disk_io_now{device="dm-0"} 0
+node_disk_io_now{device="sda"} 0
+
+node_disk_io_time_seconds_total{device="dm-0"} 3.948
+node_disk_io_time_seconds_total{device="sda"} 4.0120000000000005
+
+node_disk_io_time_weighted_seconds_total{device="dm-0"} 13.4
+node_disk_io_time_weighted_seconds_total{device="sda"} 2.136
+
+node_disk_read_bytes_total{device="dm-0"} 2.48976384e+08
+node_disk_read_bytes_total{device="sda"} 2.58381824e+08
+
+node_disk_read_time_seconds_total{device="dm-0"} 12.716000000000001
+node_disk_read_time_seconds_total{device="sda"} 7.469
+
+node_disk_write_time_seconds_total{device="dm-0"} 0.684
+node_disk_write_time_seconds_total{device="sda"} 0.6980000000000001
+
+node_disk_written_bytes_total{device="dm-0"} 1.2886016e+07
+node_disk_written_bytes_total{device="sda"} 1.2857344e+07
+
+node_filesystem_avail_bytes{device="/dev/mapper/ubuntu--vg-ubuntu--lv",fstype="ext4",mountpoint="/"} 2.6015756288e+10
+node_filesystem_avail_bytes{device="/dev/sda2",fstype="ext4",mountpoint="/boot"} 1.339236352e+09
+node_filesystem_avail_bytes{device="tmpfs",fstype="tmpfs",mountpoint="/run"} 2.06913536e+08
+node_filesystem_avail_bytes{device="tmpfs",fstype="tmpfs",mountpoint="/run/lock"} 5.24288e+06
+node_filesystem_avail_bytes{device="tmpfs",fstype="tmpfs",mountpoint="/run/snapd/ns"} 2.06913536e+08
+node_filesystem_avail_bytes{device="tmpfs",fstype="tmpfs",mountpoint="/run/user/1000"} 2.07896576e+08
+
+node_filesystem_device_error{device="/dev/mapper/ubuntu--vg-ubuntu--lv",fstype="ext4",mountpoint="/"} 0
+node_filesystem_device_error{device="/dev/sda2",fstype="ext4",mountpoint="/boot"} 0
+node_filesystem_device_error{device="tmpfs",fstype="tmpfs",mountpoint="/run"} 0
+node_filesystem_device_error{device="tmpfs",fstype="tmpfs",mountpoint="/run/lock"} 0
+node_filesystem_device_error{device="tmpfs",fstype="tmpfs",mountpoint="/run/snapd/ns"} 0
+node_filesystem_device_error{device="tmpfs",fstype="tmpfs",mountpoint="/run/user/1000"} 0
+
+node_filesystem_free_bytes{device="/dev/mapper/ubuntu--vg-ubuntu--lv",fstype="ext4",mountpoint="/"} 2.7710042112e+10
+node_filesystem_free_bytes{device="/dev/sda2",fstype="ext4",mountpoint="/boot"} 1.436540928e+09
+node_filesystem_free_bytes{device="tmpfs",fstype="tmpfs",mountpoint="/run"} 2.06913536e+08
+node_filesystem_free_bytes{device="tmpfs",fstype="tmpfs",mountpoint="/run/lock"} 5.24288e+06
+node_filesystem_free_bytes{device="tmpfs",fstype="tmpfs",mountpoint="/run/snapd/ns"} 2.06913536e+08
+node_filesystem_free_bytes{device="tmpfs",fstype="tmpfs",mountpoint="/run/user/1000"} 2.07896576e+08
+
+node_filesystem_size_bytes{device="/dev/mapper/ubuntu--vg-ubuntu--lv",fstype="ext4",mountpoint="/"} 3.2889438208e+10
+node_filesystem_size_bytes{device="/dev/sda2",fstype="ext4",mountpoint="/boot"} 1.551745024e+09
+node_filesystem_size_bytes{device="tmpfs",fstype="tmpfs",mountpoint="/run"} 2.07900672e+08
+node_filesystem_size_bytes{device="tmpfs",fstype="tmpfs",mountpoint="/run/lock"} 5.24288e+06
+node_filesystem_size_bytes{device="tmpfs",fstype="tmpfs",mountpoint="/run/snapd/ns"} 2.07900672e+08
+node_filesystem_size_bytes{device="tmpfs",fstype="tmpfs",mountpoint="/run/user/1000"} 2.07896576e+08
+
+
+node_memory_MemAvailable_bytes 1.764040704e+09
+node_memory_MemFree_bytes 1.534324736e+09
+node_memory_MemTotal_bytes 2.078969856e+09
+
+
+node_memory_SwapCached_bytes 0
+node_memory_SwapFree_bytes 2.047864832e+09
+node_memory_SwapTotal_bytes 2.047864832e+09
+
+
+
+node_network_info{address="00:00:00:00:00:00",broadcast="00:00:00:00:00:00",device="lo",duplex="",ifalias="",operstate="unknown"} 1
+node_network_info{address="08:00:27:a2:6b:fd",broadcast="ff:ff:ff:ff:ff:ff",device="eth0",duplex="full",ifalias="",operstate="up"} 1
+
+
+node_network_receive_bytes_total{device="eth0"} 108798
+node_network_receive_bytes_total{device="lo"} 0
+
+node_network_receive_errs_total{device="eth0"} 0
+node_network_receive_errs_total{device="lo"} 0
+
+node_network_transmit_errs_total{device="eth0"} 0
+node_network_transmit_errs_total{device="lo"} 0
+
+
+
+node_os_info{build_id="",id="ubuntu",id_like="debian",image_id="",image_version="",name="Ubuntu",pretty_name="Ubuntu 20.04.4 LTS",variant="",variant_id="",version="20.04.4 LTS (Focal Fossa)",version_codename="focal",version_id="20.04"} 1
+
