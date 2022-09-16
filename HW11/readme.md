@@ -14,7 +14,7 @@ HOST: stackoverflow.com
 ```
 - В ответе укажите полученный HTTP код, что он означает?
 
-
+```bash
     vagrant@vagrant:~$ telnet stackoverflow.com 80
     Trying 151.101.129.69...
     Connected to stackoverflow.com.
@@ -39,7 +39,7 @@ HOST: stackoverflow.com
     X-DNS-Prefetch-Control: off
     
     Connection closed by foreign host.
-
+```
 Сделали запрос HOST, в ответ получили информацию о сервере.
 
 #### 2. Повторите задание 1 в браузере, используя консоль разработчика F12.
@@ -58,8 +58,9 @@ HOST: stackoverflow.com
 
 #### 3. Какой IP адрес у вас в интернете?
 ![](myip.png)
-vagrant@vagrant:~$ curl ifconfig.me/ip
-62.33.165.238
+    
+    vagrant@vagrant:~$ curl ifconfig.me/ip
+    62.33.165.238
 
 #### 4. Какому провайдеру принадлежит ваш IP адрес? Какой автономной системе AS? Воспользуйтесь утилитой `whois`
 
