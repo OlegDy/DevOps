@@ -139,4 +139,4 @@ UDP порты открыты: 53 для DNS резолвера и 68 для boo
 
 ![](homelan.drawio.png)
 
-![](homelan 2.drawio.png)
+![](homelan_2.drawio.png)
