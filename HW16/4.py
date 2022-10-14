@@ -3,6 +3,7 @@
 import socket
 import time
 import datetime
+import os
 
 list_hosts = ['drive.google.com', 'mail.google.com', 'google.com']
 
@@ -25,4 +26,5 @@ while True:
             list_scan[i] = (pair[0], ip_new)
         i += 1
         time.sleep(0.5)
+    os.system('ipconfig /flushdns > nul')
 # endWhile
