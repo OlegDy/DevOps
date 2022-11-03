@@ -29,3 +29,5 @@ docker run -d -v /data:/data --name debian debian
 docker run -it --rm -d -v /data:/data --name debian debian
 
 docker run -it --rm -d --name centos1 centos:centos7
+
+https://highload.today/docker-run/
