@@ -1,0 +1,31 @@
+
+
+docker cp nginx.conf containerID:/etc/nginx/nginx.conf
+
+docker run -p 8080:80 -it nginxdemos/hello /bin/bash
+
+docker run -d -p 8080:80 nginxdemos/hello --name ng
+
+docker cp index.html ng:/usr/share/nginx/html/index.html
+
+docker exec -it ng /bin/sh
+
+
+https://habr.com/ru/post/339610/
+
+
+docker tag local-image:tagname new-repo:tagname
+docker push new-repo:tagname
+
+docker tag ng_devops:latest olegdy:v001
+
+
+
+docker run -d -v /data:/data --name centos centos
+docker run -it --rm -d -v /data:/data --name centos centos
+
+
+docker run -d -v /data:/data --name debian debian
+docker run -it --rm -d -v /data:/data --name debian debian
+
+docker run -it --rm -d --name centos1 centos:centos7
