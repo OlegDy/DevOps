@@ -17,7 +17,7 @@
 1. Найдите, где перечислены все доступные `resource` и `data_source`, приложите ссылку на эти строки в коде на 
 гитхабе.  
 
-файл```terraform-provider-aws/internal/provider/provider.go```
+файл```terraform-provider-aws/internal/provider/provider.go```  
 [ResourcesMap](https://github.com/hashicorp/terraform-provider-aws/blob/fbc1c405d771b831dfad7a3e5ab7532341aa1d75/internal/provider/provider.go#L943)  
 [DataSourcesMap](https://github.com/hashicorp/terraform-provider-aws/blob/fbc1c405d771b831dfad7a3e5ab7532341aa1d75/internal/provider/provider.go#L419)
 
@@ -27,7 +27,7 @@
 
 
 2. Для создания очереди сообщений SQS используется ресурс `aws_sqs_queue` у которого есть параметр `name`. 
-  * С каким другим параметром конфликтует `name`? Приложите строчку кода, в которой это указано.
+  * С каким другим параметром конфликтует `name`? Приложите строчку кода, в которой это указано.  
       Конфликтует с `name_prefix`
       [Строчка](https://github.com/hashicorp/terraform-provider-aws/blob/fbc1c405d771b831dfad7a3e5ab7532341aa1d75/internal/service/sqs/queue.go#L83)
       ```
