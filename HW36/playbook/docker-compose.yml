@@ -1,0 +1,17 @@
+version: '3.3'
+services:
+  clickhouse:
+    privileged: true
+    image: pycontribs/centos:7
+    #image: centos/systemd
+    container_name: clickhouse-01
+    restart: unless-stopped
+    #entrypoint: "sleep infinity"
+    entrypoint: "/usr/sbin/init"
+  vector:
+    privileged: true
+    image: pycontribs/centos:7
+    container_name: vector-01
+    restart: unless-stopped
+    #entrypoint: "sleep infinity"
+    entrypoint: "/usr/sbin/init"
