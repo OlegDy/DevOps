@@ -1,0 +1,90 @@
+root@server1:/vagrant/playbook83# ansible-playbook site.yml -i inventory/prod.yml --diff
+
+PLAY [Install Clickhouse] **************************************************************************************************
+
+TASK [Gathering Facts] *****************************************************************************************************
+ok: [clickhouse-01]
+
+TASK [Get clickhouse distrib] **********************************************************************************************
+ok: [clickhouse-01] => (item=clickhouse-client)
+ok: [clickhouse-01] => (item=clickhouse-server)
+failed: [clickhouse-01] (item=clickhouse-common-static) => {"ansible_loop_var": "item", "changed": false, "dest": "./clickhouse-common-static-22.3.3.44.rpm", "elapsed": 0, "gid": 1000, "group": "centos", "item": "clickhouse-common-static", "mode": "0664", "msg": "Request failed", "owner": "centos", "response": "HTTP Error 404: Not Found", "secontext": "unconfined_u:object_r:user_home_t:s0", "size": 246310036, "state": "file", "status_code": 404, "uid": 1000, "url": "https://packages.clickhouse.com/rpm/stable/clickhouse-common-static-22.3.3.44.noarch.rpm"}
+
+TASK [Get clickhouse distrib] **********************************************************************************************
+ok: [clickhouse-01]
+
+TASK [Install clickhouse packages] *****************************************************************************************
+ok: [clickhouse-01]
+
+PLAY [Create database Clickhouse] ******************************************************************************************
+
+TASK [Gathering Facts] *****************************************************************************************************
+ok: [clickhouse-01]
+
+TASK [Create database] *****************************************************************************************************
+ok: [clickhouse-01]
+
+PLAY [Install vector] ******************************************************************************************************
+
+TASK [Gathering Facts] *****************************************************************************************************
+ok: [vector-01]
+
+TASK [Install Vector] ******************************************************************************************************
+ok: [vector-01]
+
+TASK [Configure Service] ***************************************************************************************************
+ok: [vector-01]
+
+TASK [Configure Vector 1] **************************************************************************************************
+ok: [vector-01]
+
+TASK [Configure Vector 2] **************************************************************************************************
+ok: [vector-01]
+
+PLAY [Install nginx] *******************************************************************************************************
+
+TASK [Gathering Facts] *****************************************************************************************************
+ok: [lighthouse-01]
+
+TASK [Install epel-release] ************************************************************************************************
+ok: [lighthouse-01]
+
+TASK [Install nginx] *******************************************************************************************************
+ok: [lighthouse-01]
+
+PLAY [Install lighthouse] **************************************************************************************************
+
+TASK [Gathering Facts] *****************************************************************************************************
+ok: [lighthouse-01]
+
+TASK [install unzip] *******************************************************************************************************
+ok: [lighthouse-01]
+
+TASK [Get lighthouse distrib] **********************************************************************************************
+changed: [lighthouse-01]
+
+TASK [Create a directory if it does not exist] *****************************************************************************
+ok: [lighthouse-01]
+
+TASK [Unarchive lighthouse distrib into nginx] *****************************************************************************
+ok: [lighthouse-01]
+
+TASK [Make nginx config] ***************************************************************************************************
+ok: [lighthouse-01]
+
+TASK [Remove lighthouse distrib] *******************************************************************************************
+--- before
++++ after
+@@ -1,4 +1,4 @@
+ {
+     "path": "./lighthouse.zip",
+-    "state": "file"
++    "state": "absent"
+ }
+
+changed: [lighthouse-01]
+
+PLAY RECAP *****************************************************************************************************************
+clickhouse-01              : ok=5    changed=0    unreachable=0    failed=0    skipped=0    rescued=1    ignored=0
+lighthouse-01              : ok=10   changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+vector-01                  : ok=5    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0

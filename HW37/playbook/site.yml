@@ -1,0 +1,148 @@
+---
+#Clickhouse
+- name: Install Clickhouse
+  hosts: clickhouse-01
+  handlers:
+    - name: Start clickhouse service
+      become: true
+      ansible.builtin.service:
+        name: clickhouse-server
+        state: restarted
+
+  tasks:
+    - block:
+        - name: Get clickhouse distrib
+          ansible.builtin.get_url:
+            url: "https://packages.clickhouse.com/rpm/stable/{{ item }}-{{ clickhouse_version }}.noarch.rpm"
+            dest: "./{{ item }}-{{ clickhouse_version }}.rpm"
+          with_items: "{{ clickhouse_packages }}"
+      rescue:
+        - name: Get clickhouse distrib
+          ansible.builtin.get_url:
+            url: "https://packages.clickhouse.com/rpm/stable/clickhouse-common-static-{{ clickhouse_version }}.x86_64.rpm"
+            dest: "./clickhouse-common-static-{{ clickhouse_version }}.rpm"
+    - name: Install clickhouse packages
+      become: true
+      ansible.builtin.yum:
+        name:
+          - clickhouse-common-static-{{ clickhouse_version }}.rpm
+          - clickhouse-client-{{ clickhouse_version }}.rpm
+          - clickhouse-server-{{ clickhouse_version }}.rpm
+      notify: Start clickhouse service
+
+- name: Create database Clickhouse
+  hosts: clickhouse-01
+  tasks:
+    - name: Create database
+      ansible.builtin.command: "clickhouse-client -q 'create database logs;'"
+      register: create_db
+      failed_when: create_db.rc != 0 and create_db.rc !=82
+      changed_when: create_db.rc == 0
+
+# vector
+- name: Install vector
+  hosts: vector-01
+  handlers:
+    - name: restart vector service
+      become: true
+      ansible.builtin.systemd:
+      #ansible.builtin.service:
+        name: vector
+        state: restarted
+        daemon_reload: true
+
+  tasks:
+    - name: Install Vector
+      become: true
+      ansible.builtin.yum:
+        name: https://packages.timber.io/vector/{{ vector_version }}/vector-{{ vector_version }}-1.{{ ansible_architecture }}.rpm
+        state: present
+      notify: restart vector service
+
+    - name: Configure Service
+      become: true
+      ansible.builtin.template:
+        src: vector.service.j2
+        dest: /etc/systemd/system/vector.service
+        mode: 0644
+      notify: restart vector service
+
+    - name: Configure Vector 1
+      file:
+        path: "{{ vector_config_dir }}"
+        state: directory
+        mode: 0744
+
+    - name: Configure Vector 2
+      ansible.builtin.template:
+        src: vector.yml.j2
+        mode: 0644
+        dest: "{{ vector_config_dir }}/vector.yml"
+
+
+#lighthouse
+- name: Install nginx
+  hosts: lighthouse
+  handlers:
+    - name: restart nginx service
+      become: true
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+  tasks:
+    - name: Install epel-release
+      become: true
+      ansible.builtin.yum:
+        name: epel-release
+        state: present
+    - name: Install nginx
+      become: true
+      ansible.builtin.yum:
+        name: nginx
+        state: present
+        #state: latest
+        update_cache: yes
+      notify: restart nginx service
+
+- name: Install lighthouse
+  hosts: lighthouse
+  handlers:
+    - name: restart nginx service
+      become: true
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+  pre_tasks:
+    - name: install unzip
+      become: true
+      ansible.builtin.yum:
+        name: unzip
+        state: present
+        update_cache: yes
+  tasks:
+    - name: Get lighthouse distrib
+      ansible.builtin.get_url:
+        url: "https://github.com/VKCOM/lighthouse/archive/refs/heads/master.zip"
+        dest: "./lighthouse.zip"
+    - name: Create a directory if it does not exist
+      become: true
+      ansible.builtin.file:
+        path: /usr/share/nginx/
+        state: directory
+    - name: Unarchive lighthouse distrib into nginx
+      become: true
+      ansible.builtin.unarchive:
+        src: ./lighthouse.zip
+        dest: /usr/share/nginx/
+        remote_src: yes
+      notify: restart nginx service
+    - name: Make nginx config
+      become: true
+      ansible.builtin.template:
+        src: ./templates/nginx.j2
+        dest: /etc/nginx/conf.d/lighthouse.conf
+      notify: restart nginx service
+    - name: Remove lighthouse distrib
+      ansible.builtin.file:
+        path: "./lighthouse.zip"
+        state: absent
