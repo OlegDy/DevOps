@@ -1,0 +1,49 @@
+---
+- name: Install epel-release
+  become: true
+  ansible.builtin.yum:
+    name: epel-release
+    state: present
+
+- name: Install nginx
+  become: true
+  ansible.builtin.yum:
+    name: nginx
+    state: present
+    update_cache: yes
+  notify: restart nginx service
+
+- name: install unzip
+  become: true
+  ansible.builtin.yum:
+    name: unzip
+    state: present
+    update_cache: yes
+
+- name: Get lighthouse distrib
+  ansible.builtin.get_url:
+    url: "https://github.com/VKCOM/lighthouse/archive/refs/heads/master.zip"
+    dest: "./lighthouse.zip"
+- name: Create a directory if it does not exist
+  become: true
+  ansible.builtin.file:
+    path: /usr/share/nginx/
+    state: directory
+- name: Unarchive lighthouse distrib into nginx
+  become: true
+  ansible.builtin.unarchive:
+    src: ./lighthouse.zip
+    dest: /usr/share/nginx/
+    remote_src: yes
+  notify: restart nginx service
+- name: Make nginx config
+  become: true
+  ansible.builtin.template:
+    src: ./templates/nginx.j2
+    dest: /etc/nginx/conf.d/lighthouse.conf
+  notify: restart nginx service
+- name: Remove lighthouse distrib
+  ansible.builtin.file:
+    path: "./lighthouse.zip"
+    state: absent
+

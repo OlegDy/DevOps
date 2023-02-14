@@ -1,0 +1,28 @@
+---
+- name: Install Vector
+  become: true
+  ansible.builtin.yum:
+    name: https://packages.timber.io/vector/{{ vector_version }}/vector-{{ vector_version }}-1.{{ ansible_architecture }}.rpm
+    state: present
+  notify: restart vector service
+
+- name: Configure Service
+  become: true
+  ansible.builtin.template:
+    src: vector.service.j2
+    dest: /etc/systemd/system/vector.service
+    mode: 0644
+  notify: restart vector service
+
+- name: Configure Vector 1
+  file:
+    path: "{{ vector_config_dir }}"
+    state: directory
+    mode: 0744
+
+- name: Configure Vector 2
+  ansible.builtin.template:
+    src: vector.yml.j2
+    mode: 0644
+    dest: "{{ vector_config_dir }}/vector.yml"
+
