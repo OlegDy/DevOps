@@ -1,0 +1,232 @@
+root@server2:/vagrant/playbook85/roles/vector-role# molecule test
+INFO     default scenario test matrix: dependency, lint, cleanup, destroy, syntax, create, prepare, converge, idempotence, side_effect, verify, cleanup, destroy
+INFO     Performing prerun...
+WARNING  Computed fully qualified role name of vector-role does not follow current galaxy requirements.
+Please edit meta/main.yml and assure we can correctly determine full role name:
+
+galaxy_info:
+role_name: my_name  # if absent directory name hosting role is used instead
+namespace: my_galaxy_namespace  # if absent, author is used instead
+
+Namespace: https://galaxy.ansible.com/docs/contributing/namespaces.html#galaxy-namespace-limitations
+Role: https://galaxy.ansible.com/docs/contributing/creating_role.html#role-names
+
+As an alternative, you can add 'role-name' to either skip_list or warn_list.
+
+INFO     Using /root/.cache/roles/vector-role symlink to current repository in order to enable Ansible to find the role using its expected full name.
+INFO     Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:/root/.cache/roles
+INFO     Running default > dependency
+WARNING  Skipping, missing the requirements file.
+WARNING  Skipping, missing the requirements file.
+INFO     Running default > lint
+INFO     Lint is disabled.
+INFO     Running default > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running default > destroy
+INFO     Sanity checks: 'docker'
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item=centos7)
+changed: [localhost] => (item=centos8)
+changed: [localhost] => (item=ubuntu)
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+ok: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '659220666328.115300', 'results_file': '/root/.ansible_async/659220666328.115300', 'changed': True, 'item': {'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'image': 'centos:7', 'name': 'centos7', 'privileged': True}, 'ansible_loop_var': 'item'})
+ok: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '618229273212.115327', 'results_file': '/root/.ansible_async/618229273212.115327', 'changed': True, 'item': {'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'image': 'centos:8', 'name': 'centos8', 'privileged': True}, 'ansible_loop_var': 'item'})
+ok: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '668385205579.115367', 'results_file': '/root/.ansible_async/668385205579.115367', 'changed': True, 'item': {'capabilities': ['SYS_ADMIN'], 'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'env': {'ANSIBLE_USER': 'ansible', 'DEPLOY_GROUP': 'deployer', 'SUDO_GROUP': 'sudo', 'container': 'docker'}, 'image': 'ubuntu:focal', 'name': 'ubuntu', 'privileged': True, 'tmpfs': ['/run', '/tmp'], 'volumes': ['/sys/fs/cgroup:/sys/fs/cgroup']}, 'ansible_loop_var': 'item'})
+
+TASK [Delete docker network(s)] ************************************************
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+INFO     Running default > syntax
+
+playbook: /vagrant/playbook85/roles/vector-role/molecule/default/converge.yml
+INFO     Running default > create
+
+PLAY [Create] ******************************************************************
+
+TASK [Log into a Docker registry] **********************************************
+skipping: [localhost] => (item={'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'image': 'centos:7', 'name': 'centos7', 'privileged': True})
+skipping: [localhost] => (item={'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'image': 'centos:8', 'name': 'centos8', 'privileged': True})
+skipping: [localhost] => (item={'capabilities': ['SYS_ADMIN'], 'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'env': {'ANSIBLE_USER': 'ansible', 'DEPLOY_GROUP': 'deployer', 'SUDO_GROUP': 'sudo', 'container': 'docker'}, 'image': 'ubuntu:focal', 'name': 'ubuntu', 'privileged': True, 'tmpfs': ['/run', '/tmp'], 'volumes': ['/sys/fs/cgroup:/sys/fs/cgroup']})
+
+TASK [Check presence of custom Dockerfiles] ************************************
+ok: [localhost] => (item={'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'image': 'centos:7', 'name': 'centos7', 'privileged': True})
+ok: [localhost] => (item={'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'image': 'centos:8', 'name': 'centos8', 'privileged': True})
+ok: [localhost] => (item={'capabilities': ['SYS_ADMIN'], 'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'env': {'ANSIBLE_USER': 'ansible', 'DEPLOY_GROUP': 'deployer', 'SUDO_GROUP': 'sudo', 'container': 'docker'}, 'image': 'ubuntu:focal', 'name': 'ubuntu', 'privileged': True, 'tmpfs': ['/run', '/tmp'], 'volumes': ['/sys/fs/cgroup:/sys/fs/cgroup']})
+
+TASK [Create Dockerfiles from image names] *************************************
+changed: [localhost] => (item={'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'image': 'centos:7', 'name': 'centos7', 'privileged': True})
+changed: [localhost] => (item={'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'image': 'centos:8', 'name': 'centos8', 'privileged': True})
+changed: [localhost] => (item={'capabilities': ['SYS_ADMIN'], 'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'env': {'ANSIBLE_USER': 'ansible', 'DEPLOY_GROUP': 'deployer', 'SUDO_GROUP': 'sudo', 'container': 'docker'}, 'image': 'ubuntu:focal', 'name': 'ubuntu', 'privileged': True, 'tmpfs': ['/run', '/tmp'], 'volumes': ['/sys/fs/cgroup:/sys/fs/cgroup']})
+
+TASK [Discover local Docker images] ********************************************
+ok: [localhost] => (item={'diff': [], 'dest': '/root/.cache/molecule/vector-role/default/Dockerfile_centos_7', 'src': '/root/.ansible/tmp/ansible-tmp-1676598225.6314383-115587-88398094932818/source', 'md5sum': 'fd341b6280f87a872bf8890df5c0bc92', 'checksum': '233a8b9aa85a4fe93b09e62ce108520490ad00e9', 'changed': True, 'uid': 0, 'gid': 0, 'owner': 'root', 'group': 'root', 'mode': '0600', 'state': 'file', 'size': 3648, 'invocation': {'module_args': {'src': '/root/.ansible/tmp/ansible-tmp-1676598225.6314383-115587-88398094932818/source', 'dest': '/root/.cache/molecule/vector-role/default/Dockerfile_centos_7', 'mode': '0600', 'follow': False, '_original_basename': 'Dockerfile.j2', 'checksum': '233a8b9aa85a4fe93b09e62ce108520490ad00e9', 'backup': False, 'force': True, 'unsafe_writes': False, 'content': None, 'validate': None, 'directory_mode': None, 'remote_src': None, 'local_follow': None, 'owner': None, 'group': None, 'seuser': None, 'serole': None, 'selevel': None, 'setype': None, 'attributes': None}}, 'failed': False, 'item': {'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'image': 'centos:7', 'name': 'centos7', 'privileged': True}, 'ansible_loop_var': 'item', 'i': 0, 'ansible_index_var': 'i'})
+ok: [localhost] => (item={'diff': [], 'dest': '/root/.cache/molecule/vector-role/default/Dockerfile_centos_8', 'src': '/root/.ansible/tmp/ansible-tmp-1676598225.9664147-115587-217942188285527/source', 'md5sum': '1971c75923921dda4956df46c7fc61ce', 'checksum': '68cb441e1c731de4a0b9f9c093eaa6faccd7a333', 'changed': True, 'uid': 0, 'gid': 0, 'owner': 'root', 'group': 'root', 'mode': '0600', 'state': 'file', 'size': 3648, 'invocation': {'module_args': {'src': '/root/.ansible/tmp/ansible-tmp-1676598225.9664147-115587-217942188285527/source', 'dest': '/root/.cache/molecule/vector-role/default/Dockerfile_centos_8', 'mode': '0600', 'follow': False, '_original_basename': 'Dockerfile.j2', 'checksum': '68cb441e1c731de4a0b9f9c093eaa6faccd7a333', 'backup': False, 'force': True, 'unsafe_writes': False, 'content': None, 'validate': None, 'directory_mode': None, 'remote_src': None, 'local_follow': None, 'owner': None, 'group': None, 'seuser': None, 'serole': None, 'selevel': None, 'setype': None, 'attributes': None}}, 'failed': False, 'item': {'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'image': 'centos:8', 'name': 'centos8', 'privileged': True}, 'ansible_loop_var': 'item', 'i': 1, 'ansible_index_var': 'i'})
+ok: [localhost] => (item={'diff': [], 'dest': '/root/.cache/molecule/vector-role/default/Dockerfile_ubuntu_focal', 'src': '/root/.ansible/tmp/ansible-tmp-1676598226.2221682-115587-245985834750769/source', 'md5sum': 'b4a918fa72ee5c0f06ad8874732cc36b', 'checksum': 'b4ca383a98d11113e5527d880ec6454d6048ca64', 'changed': True, 'uid': 0, 'gid': 0, 'owner': 'root', 'group': 'root', 'mode': '0600', 'state': 'file', 'size': 3744, 'invocation': {'module_args': {'src': '/root/.ansible/tmp/ansible-tmp-1676598226.2221682-115587-245985834750769/source', 'dest': '/root/.cache/molecule/vector-role/default/Dockerfile_ubuntu_focal', 'mode': '0600', 'follow': False, '_original_basename': 'Dockerfile.j2', 'checksum': 'b4ca383a98d11113e5527d880ec6454d6048ca64', 'backup': False, 'force': True, 'unsafe_writes': False, 'content': None, 'validate': None, 'directory_mode': None, 'remote_src': None, 'local_follow': None, 'owner': None, 'group': None, 'seuser': None, 'serole': None, 'selevel': None, 'setype': None, 'attributes': None}}, 'failed': False, 'item': {'capabilities': ['SYS_ADMIN'], 'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'env': {'ANSIBLE_USER': 'ansible', 'DEPLOY_GROUP': 'deployer', 'SUDO_GROUP': 'sudo', 'container': 'docker'}, 'image': 'ubuntu:focal', 'name': 'ubuntu', 'privileged': True, 'tmpfs': ['/run', '/tmp'], 'volumes': ['/sys/fs/cgroup:/sys/fs/cgroup']}, 'ansible_loop_var': 'item', 'i': 2, 'ansible_index_var': 'i'})
+
+TASK [Build an Ansible compatible image (new)] *********************************
+ok: [localhost] => (item=molecule_local/centos:7)
+ok: [localhost] => (item=molecule_local/centos:8)
+ok: [localhost] => (item=molecule_local/ubuntu:focal)
+
+TASK [Create docker network(s)] ************************************************
+
+TASK [Determine the CMD directives] ********************************************
+ok: [localhost] => (item={'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'image': 'centos:7', 'name': 'centos7', 'privileged': True})
+ok: [localhost] => (item={'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'image': 'centos:8', 'name': 'centos8', 'privileged': True})
+ok: [localhost] => (item={'capabilities': ['SYS_ADMIN'], 'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'env': {'ANSIBLE_USER': 'ansible', 'DEPLOY_GROUP': 'deployer', 'SUDO_GROUP': 'sudo', 'container': 'docker'}, 'image': 'ubuntu:focal', 'name': 'ubuntu', 'privileged': True, 'tmpfs': ['/run', '/tmp'], 'volumes': ['/sys/fs/cgroup:/sys/fs/cgroup']})
+
+TASK [Create molecule instance(s)] *********************************************
+changed: [localhost] => (item=centos7)
+changed: [localhost] => (item=centos8)
+changed: [localhost] => (item=ubuntu)
+
+TASK [Wait for instance(s) creation to complete] *******************************
+changed: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '45319886247.115972', 'results_file': '/root/.ansible_async/45319886247.115972', 'changed': True, 'item': {'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'image': 'centos:7', 'name': 'centos7', 'privileged': True}, 'ansible_loop_var': 'item'})
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (300 retries left).
+changed: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '24563252536.116000', 'results_file': '/root/.ansible_async/24563252536.116000', 'changed': True, 'item': {'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'image': 'centos:8', 'name': 'centos8', 'privileged': True}, 'ansible_loop_var': 'item'})
+changed: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '641180567606.116039', 'results_file': '/root/.ansible_async/641180567606.116039', 'changed': True, 'item': {'capabilities': ['SYS_ADMIN'], 'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'env': {'ANSIBLE_USER': 'ansible', 'DEPLOY_GROUP': 'deployer', 'SUDO_GROUP': 'sudo', 'container': 'docker'}, 'image': 'ubuntu:focal', 'name': 'ubuntu', 'privileged': True, 'tmpfs': ['/run', '/tmp'], 'volumes': ['/sys/fs/cgroup:/sys/fs/cgroup']}, 'ansible_loop_var': 'item'})
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=7    changed=3    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0
+
+INFO     Running default > prepare
+WARNING  Skipping, prepare playbook not configured.
+INFO     Running default > converge
+
+PLAY [Converge] ****************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [centos8]
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Include vector-role] *****************************************************
+
+TASK [vector-role : Install Vector yum] ****************************************
+skipping: [ubuntu]
+changed: [centos7]
+changed: [centos8]
+
+TASK [vector-role : Install Vector apt] ****************************************
+skipping: [centos7]
+skipping: [centos8]
+changed: [ubuntu]
+
+TASK [vector-role : Configure Service] *****************************************
+changed: [centos7]
+changed: [ubuntu]
+changed: [centos8]
+
+TASK [vector-role : Configure Vector 1] ****************************************
+changed: [centos7]
+changed: [centos8]
+changed: [ubuntu]
+
+TASK [vector-role : Configure Vector 2] ****************************************
+changed: [centos7]
+changed: [ubuntu]
+changed: [centos8]
+
+RUNNING HANDLER [vector-role : restart vector service] *************************
+changed: [ubuntu]
+changed: [centos8]
+changed: [centos7]
+
+PLAY RECAP *********************************************************************
+centos7                    : ok=6    changed=5    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+centos8                    : ok=6    changed=5    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+ubuntu                     : ok=6    changed=5    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+INFO     Running default > idempotence
+
+PLAY [Converge] ****************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [ubuntu]
+ok: [centos8]
+ok: [centos7]
+
+TASK [Include vector-role] *****************************************************
+
+TASK [vector-role : Install Vector yum] ****************************************
+skipping: [ubuntu]
+ok: [centos7]
+ok: [centos8]
+
+TASK [vector-role : Install Vector apt] ****************************************
+skipping: [centos7]
+skipping: [centos8]
+ok: [ubuntu]
+
+TASK [vector-role : Configure Service] *****************************************
+ok: [centos7]
+ok: [ubuntu]
+ok: [centos8]
+
+TASK [vector-role : Configure Vector 1] ****************************************
+ok: [centos7]
+ok: [centos8]
+ok: [ubuntu]
+
+TASK [vector-role : Configure Vector 2] ****************************************
+ok: [centos7]
+ok: [centos8]
+ok: [ubuntu]
+
+PLAY RECAP *********************************************************************
+centos7                    : ok=5    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+centos8                    : ok=5    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+ubuntu                     : ok=5    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+INFO     Idempotence completed successfully.
+INFO     Running default > side_effect
+WARNING  Skipping, side effect playbook not configured.
+INFO     Running default > verify
+INFO     Running Ansible Verifier
+
+PLAY [Verify] ******************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [ubuntu]
+ok: [centos8]
+ok: [centos7]
+
+TASK [verify vector is started] ************************************************
+changed: [centos8]
+changed: [ubuntu]
+changed: [centos7]
+
+PLAY RECAP *********************************************************************
+centos7                    : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+centos8                    : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+ubuntu                     : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+INFO     Verifier completed successfully.
+INFO     Running default > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running default > destroy
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item=centos7)
+changed: [localhost] => (item=centos8)
+changed: [localhost] => (item=ubuntu)
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+changed: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '584078743386.129891', 'results_file': '/root/.ansible_async/584078743386.129891', 'changed': True, 'item': {'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'image': 'centos:7', 'name': 'centos7', 'privileged': True}, 'ansible_loop_var': 'item'})
+changed: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '166731751119.129918', 'results_file': '/root/.ansible_async/166731751119.129918', 'changed': True, 'item': {'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'image': 'centos:8', 'name': 'centos8', 'privileged': True}, 'ansible_loop_var': 'item'})
+changed: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '543244992803.129965', 'results_file': '/root/.ansible_async/543244992803.129965', 'changed': True, 'item': {'capabilities': ['SYS_ADMIN'], 'command': '/usr/sbin/init', 'dockerfile': '../resources/Dockerfile.j2', 'env': {'ANSIBLE_USER': 'ansible', 'DEPLOY_GROUP': 'deployer', 'SUDO_GROUP': 'sudo', 'container': 'docker'}, 'image': 'ubuntu:focal', 'name': 'ubuntu', 'privileged': True, 'tmpfs': ['/run', '/tmp'], 'volumes': ['/sys/fs/cgroup:/sys/fs/cgroup']}, 'ansible_loop_var': 'item'})
+
+TASK [Delete docker network(s)] ************************************************
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+INFO     Pruning extra files from scenario ephemeral directory

@@ -1,0 +1,13 @@
+---
+  - name: ansible-clickhouse
+    src: https://github.com/AlexeySetevoi/ansible-clickhouse.git
+    #version: "latest"
+    version: "1.11.0"
+  - name: lighthouse-role
+    src: https://github.com/OlegDy/lighthouse-role.git
+    version: "1.0.0"
+  - name: vector-role
+    src: https://github.com/OlegDy/vector-role.git
+    version: "1.0.0"
+
+
