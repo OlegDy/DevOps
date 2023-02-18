@@ -1,0 +1,92 @@
+{% if item.registry is defined %}
+FROM {{ item.registry.url }}/{{ item.image }}
+{% else %}
+FROM {{ item.image }}
+{% endif %}
+
+{% if item.env is defined %}
+{% for var, value in item.env.items() %}
+{% if value %}
+ENV {{ var }} {{ value }}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+ENV LC_ALL=C TZ=UTC TERM=xterm-256color
+
+RUN if [ $(command -v apt-get) ]; then \
+      export DEBIAN_FRONTEND=noninteractive ; \
+      export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 ; \
+      apt-get update \
+      && apt-get install -y dbus systemd gnupg systemd-sysv python3 rsyslog sudo bash ca-certificates iproute2 python3-apt aptitude \
+      && apt-get clean \
+      && rm -rf /usr/share/doc/* /usr/share/man/* /var/lib/apt/lists/* /tmp/* /var/tmp/*; \
+    elif [ $(command -v dnf) ]; then \
+        cd /etc/yum.repos.d/ \
+        && sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* \
+        && sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-* \
+        && dnf makecache \
+        && dnf --assumeyes upgrade \
+        && dnf --assumeyes install python3 sudo python3-devel rsyslog python*-dnf bash iproute && dnf clean all; \
+
+    # elif [ $(command -v dnf) ]; then \
+    #   dnf makecache \
+    #   && dnf --assumeyes install /usr/bin/python3 /usr/bin/python3-config /usr/bin/dnf-3 findutils dbus systemd sudo bash iproute \
+    #   && dnf clean all \
+    #   && rm -rf /usr/share/doc/* /usr/share/man/* /tmp/* /var/tmp/*; \
+    elif [ $(command -v yum) ]; then \
+      sed -i 's/^\(tsflags=*\)/# \1/g' /etc/yum.conf \
+      && yum makecache fast \
+      && yum upgrade -y \
+      && yum install -y /usr/bin/python /usr/bin/python2-config dbus systemd rsyslog sudo yum-plugin-ovl bash iproute \
+      && sed -i 's/plugins=0/plugins=1/g' /etc/yum.conf \
+      && yum clean all \
+      && rm -rf /usr/share/doc/* /usr/share/man/* /tmp/* /var/tmp/*; \
+    elif [ $(command -v zypper) ]; then \
+      zypper refresh \
+      && zypper install -y python3 dbus-1 systemd systemd-sysvinit rsyslog sudo bash iproute2 \
+      && zypper clean -a \
+      && rm -rf /usr/share/doc/* /usr/share/man/* /tmp/* /var/tmp/*; \
+    elif [ $(command -v apk) ]; then \
+      apk update \
+      && apk add --no-cache python3 dbus rsyslog sudo bash ca-certificates \
+      && rm -rf /usr/share/doc/* /usr/share/man/* /tmp/* /var/tmp/*; \
+    fi
+
+# Don't start any optional services except for the few we need.
+# Ignore any errors since some directories could not exists on some distributions
+RUN find /etc/systemd/system \
+      /lib/systemd/system \
+      /usr/lib/systemd/system \
+      -path '*.wants/*' \
+      -not -name '*dbus*' \
+      -not -name '*journald*' \
+      -not -name '*systemd-tmpfiles*' \
+      -not -name '*systemd-user-sessions*' \
+      -exec rm \{} \; ; >/dev/null 2>&1
+
+# If image does have systemd set the default to be multi-user else leave it as is.
+RUN if [ $(command -v systemctl) ]; then \
+      systemctl set-default multi-user.target; \
+    fi
+
+# RUN set -xe \
+#   && groupadd -r ${ANSIBLE_USER} \
+#   && groupadd -r ${DEPLOY_GROUP} \
+#   && useradd -m -g ${ANSIBLE_USER} ${ANSIBLE_USER} \
+#   && usermod -aG ${DEPLOY_GROUP} ${ANSIBLE_USER} \
+#   && echo "%${DEPLOY_GROUP} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible
+
+# RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == \
+#     systemd-tmpfiles-setup.service ] || rm -f $i; done); \
+#     rm -rf /lib/systemd/system/multi-user.target.wants/*;\
+#     rm -rf /etc/systemd/system/*.wants/*;\
+#     rm -rf /lib/systemd/system/local-fs.target.wants/*; \
+#     rm -rf /lib/systemd/system/sockets.target.wants/*udev*; \
+#     rm -rf /lib/systemd/system/sockets.target.wants/*initctl*; \
+#     rm -rf /lib/systemd/system/basic.target.wants/*;\
+#     rm -rf /lib/systemd/system/anaconda.target.wants/*;
+
+# STOPSIGNAL SIGRTMIN+3
+# VOLUME [ "/sys/fs/cgroup" ]
+CMD ["/sbin/init"]

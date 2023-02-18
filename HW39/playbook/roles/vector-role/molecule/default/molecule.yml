@@ -1,0 +1,48 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+
+  - name: centos7
+    image: centos:7
+    dockerfile: ../resources/Dockerfile.j2
+    privileged: true
+    command: /usr/sbin/init
+
+  - name: centos8
+    image: centos:8
+    dockerfile: ../resources/Dockerfile.j2
+    privileged: true
+    command: /usr/sbin/init
+
+  - name: ubuntu
+    image: ubuntu:focal
+    dockerfile: ../resources/Dockerfile.j2
+    privileged: true
+    command: /usr/sbin/init
+    capabilities:
+      - SYS_ADMIN
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup
+    env:
+      ANSIBLE_USER: ansible
+      SUDO_GROUP: sudo
+      DEPLOY_GROUP: deployer
+      container: docker
+
+provisioner:
+  name: ansible
+verifier:
+  name: ansible
+
+     
+
+#provisioner:
+#  name: ansible
+#verifier:
+#  name: ansible
