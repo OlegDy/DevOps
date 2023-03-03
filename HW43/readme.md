@@ -43,9 +43,9 @@
 
 1. Создайте новый проект, название произвольное.
 2. Скачайте пакет sonar-scanner, который вам предлагает скачать SonarQube.
-
-sonar-scanner.bat -D"sonar.projectKey=Test" -D"sonar.sources=." -D"sonar.host.url=http://51.250.85.61:9000" -D"sonar.login=28ddf15d46601cea8908a847a02f3c2d5b1fb49c"
-
+   ```
+   sonar-scanner.bat -D"sonar.projectKey=Test" -D"sonar.sources=." -D"sonar.host.url=http://51.250.85.61:9000" -D"sonar.login=28ddf15d46601cea8908a847a02f3c2d5b1fb49c"
+   ```
 3. Сделайте так, чтобы binary был доступен через вызов в shell (или поменяйте переменную PATH, или любой другой, удобный вам способ).
 4. Проверьте `sonar-scanner --version`.
    ```
@@ -60,8 +60,9 @@ sonar-scanner.bat -D"sonar.projectKey=Test" -D"sonar.sources=." -D"sonar.host.ur
 7. Исправьте ошибки, которые он выявил, включая warnings.
 8. Запустите анализатор повторно — проверьте, что QG пройдены успешно.
 9. Сделайте скриншот успешного прохождения анализа, приложите к решению ДЗ.
-![](sonar2.png)
-![](sonar1.png)
+
+   ![](sonar2.png)
+   ![](sonar1.png)
 
 ## Знакомство с Nexus
 
