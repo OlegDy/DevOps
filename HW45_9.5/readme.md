@@ -33,7 +33,7 @@
 7. Запустите сборку по master, убедитесь, что всё прошло успешно и артефакт появился в nexus.
    ![](pic7.png) 
 8. Мигрируйте `build configuration` в репозиторий.
-   ![](pic7.png) 
+   ![](pic8.png) 
    [ссылка на .teamcity)](https://github.com/OlegDy/example-teamcity/tree/master/.teamcity)
 9. Создайте отдельную ветку `feature/add_reply` в репозитории.
 10. Напишите новый метод для класса Welcomer: метод должен возвращать произвольную реплику, содержащую слово `hunter`.
