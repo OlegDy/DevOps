@@ -1,0 +1,45 @@
+winlogbeat.event_logs:
+  - name: Application
+    ignore_older: 72h
+    tags: ["server-windows01-application"]
+
+  - name: Security
+    tags: ["server-windows01-security"]
+
+  - name: System
+    tags: ["server-windows01-system"]
+
+
+
+
+#output.kafka:
+# hosts: ["10.0.0.60:9092"]
+
+output.logstash:
+  hosts: 'localhost:5044'
+  topics:
+   - topic: "server-windows01-application"
+     when.contains:
+       tags: "server-windows01-application"
+   - topic: "server-windows01-security"
+     when.contains:
+       tags: "server-windows01-security"
+   - topic: "server-windows01-system"
+     when.contains:
+       tags: "server-windows01-system"
+
+  codec.format:
+    string: '%{[@timestamp]} %{[message]}|%{[event]}|%{[log]}|%{[winlog]}'
+
+  partition.round_robin:
+    reachable_only: false
+  required_acks: 1
+  compression: gzip
+  max_message_bytes: 1000000
+
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: C:\winbeat
+  name: winlogbeat.log
+  keepfiles: 7
