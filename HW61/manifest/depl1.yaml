@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment1
+  labels:
+    app: depl1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: depl1
+  template:
+    metadata:
+      labels:
+        app: depl1
+    spec:
+      containers:
+      - name: busybox
+        image: busybox
+        command: ['sh', '-c', 'while true; do echo message from busybox! >> /output/output.txt; sleep 5; done']
+        volumeMounts:
+        - name: depl1-volume
+          mountPath: /output
+      - name: multitool
+        image: wbitt/network-multitool:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: HTTP_PORT
+          value: "80"
+        volumeMounts:
+        - name: depl1-volume
+          mountPath: /input
+      volumes:
+      - name: depl1-volume
+        emptyDir: {}
