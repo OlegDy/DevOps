@@ -1,0 +1,313 @@
+## Домашнее задание 63 [2.3 Конфигурация приложений](https://github.com/netology-code/kuber-homeworks/blob/main/2.3/2.3.md)
+
+### Олег Дьяченко DEVOPS-22
+
+### Цель задания
+
+В тестовой среде Kubernetes необходимо создать конфигурацию и продемонстрировать работу приложения.
+
+------
+
+### Инструменты и дополнительные материалы, которые пригодятся для выполнения задания
+
+1. [Описание](https://kubernetes.io/docs/concepts/configuration/secret/) Secret.
+2. [Описание](https://kubernetes.io/docs/concepts/configuration/configmap/) ConfigMap.
+3. [Описание](https://github.com/wbitt/Network-MultiTool) Multitool.
+
+------
+
+### Задание 1. Создать Deployment приложения и решить возникшую проблему с помощью ConfigMap. Добавить веб-страницу
+
+1. Создать Deployment приложения, состоящего из контейнеров nginx и multitool.
+2. Решить возникшую проблему с помощью ConfigMap.
+
+    Также как в задании [1.3.1](https://github.com/OlegDy/DevOps/tree/main/HW58) перенес порт multitool на порт 8080, с помощью ENV, но уже с применением ConfigMap. Pod запустился и работает.
+
+    ```yaml
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: multitool-dep
+      name: multitool-dep
+      namespace: default
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: multitool
+      template:
+        metadata:
+          labels:
+            app: multitool
+        spec:
+          containers:
+          - name: nginx
+            image: nginx:latest
+            ports:
+            - containerPort: 80
+          - name: multitool
+            image: wbitt/network-multitool:latest
+            ports:
+            - containerPort: 8080
+            env:
+            - name: HTTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: depl1-cfgmap
+                  key: http-port
+            - name: HTTPS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: depl1-cfgmap
+                  key: https-port
+    ---
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: depl1-cfgmap
+    data:
+      http-port: "8080"
+      https-port: "11443"
+    ```
+
+3. Продемонстрировать, что pod стартовал и оба конейнера работают.
+
+    ```
+    PS C:\PycharmProjects\DevOps\hw63\manifest> kubectl.exe apply -f .\depl1.yaml
+    deployment.apps/multitool-dep created
+    configmap/depl1-cfgmap created
+    PS C:\PycharmProjects\DevOps\hw63\manifest> kubectl.exe get pods             
+    NAME                             READY   STATUS    RESTARTS   AGE
+    multitool-dep-869854474d-gxt8b   2/2     Running   0          10s
+    ```
+
+4. Сделать простую веб-страницу и подключить её к Nginx с помощью ConfigMap. Подключить Service и показать вывод curl или в браузере.
+
+   ```
+   lega@ubuntu-001:/$ microk8s kubectl port-forward services/depl1-svc 3000:80 --address="0.0.0.0"
+   Forwarding from 0.0.0.0:3000 -> 80
+   Handling connection for 3000
+   ```
+   
+   ![](pics/pic-1.png)
+
+6. Предоставить манифесты, а также скриншоты или вывод необходимых команд.
+
+------
+
+### Задание 2. Создать приложение с вашей веб-страницей, доступной по HTTPS 
+
+1. Создать Deployment приложения, состоящего из Nginx.
+2. Создать собственную веб-страницу и подключить её как ConfigMap к приложению.
+3. Выпустить самоподписной сертификат SSL. Создать Secret для использования сертификата.
+
+   Внес в свой домен запись ubuntu-001.dgt.local, сформировал файлы с сертификатом, преобразовал в кодировку base64.
+
+   ```
+   openssl req -x509 -nodes -days 365 -newkey rsa:4096 -sha256 -keyout selfsigned.key -out selfsigned.crt -subj "/C=RU/ST=Khabarovsk/L=Khabarovsk/O=DGT/OU=Org/CN=ubuntu-001.dgt.local"
+   ```
+   cat selfsigned.crt | base64
+   cat selfsigned.key | base64
+
+4. Создать Ingress и необходимый Service, подключить к нему SSL в вид. Продемонстировать доступ к приложению по HTTPS.
+
+   ![](pics/pic-2.png)
+   ![](pics/pic-3.png)
+
+5. Предоставить манифесты, а также скриншоты или вывод необходимых команд.
+
+   Итоговый манифест
+
+   ```yaml
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     labels:
+       app: depl2
+     name: depl2-depl
+     namespace: default
+   spec:
+     replicas: 1
+     selector:
+       matchLabels:
+         app: depl2
+     template:
+       metadata:
+         labels:
+           app: depl2
+       spec:
+         containers:
+         - name: nginx
+           image: nginx:latest
+           ports:
+           - containerPort: 80
+           volumeMounts:
+           - name: depl2-html-vol
+             mountPath: /usr/share/nginx/html
+   
+         volumes:
+         - name: depl2-html-vol
+           configMap:
+             name: depl2-cgfmap-html
+   
+   ---
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: depl2-svc
+   spec:
+     selector:
+       app: depl2
+     ports:
+     - name: depl2-svc-http-port
+       port: 80
+       targetPort: 80
+   
+   ---
+   apiVersion: networking.k8s.io/v1
+   kind: Ingress
+   metadata:
+     name: depl2-ingress
+     annotations:
+       nginx.ingress.kubernetes.io/rewrite-target: /
+   spec:
+     rules:
+     - host: ubuntu-001.dgt.local
+       http:
+         paths:
+         - path: /
+           pathType: Prefix
+           backend:
+             service:
+               name: depl2-svc
+               port:
+                 number: 80
+     tls:
+     - hosts:
+       - ubuntu-001.dgt.local
+       secretName: depl2-secret-tls
+   
+   ---
+   apiVersion: v1
+   kind: ConfigMap
+   metadata:
+     name: depl2-cgfmap-html
+   data:
+     index.html: |
+       <html>
+         <body>
+           <h1>Hello, I am nginx SSL.</h1>
+         </body>
+       </html>
+   
+   
+   ---
+   apiVersion: v1
+   kind: Secret
+   metadata:
+     name: depl2-secret-tls
+   type: kubernetes.io/tls
+   data:
+     tls.crt: |
+       LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZ4VENDQTYyZ0F3SUJBZ0lVUlNPc2Fvd2t1
+       S2ZMaFZLcmtsQ1hzMjhTNVpzd0RRWUpLb1pJaHZjTkFRRUwKQlFBd2NqRUxNQWtHQTFVRUJoTUNV
+       bFV4RXpBUkJnTlZCQWdNQ2t0b1lXSmhjbTkyYzJzeEV6QVJCZ05WQkFjTQpDa3RvWVdKaGNtOTJj
+       MnN4RERBS0JnTlZCQW9NQTBSSFZERU1NQW9HQTFVRUN3d0RUM0puTVIwd0d3WURWUVFECkRCUjFZ
+       blZ1ZEhVdE1EQXhMbVJuZEM1c2IyTmhiREFlRncweU16QTNNVFF3TnpBek1EaGFGdzB5TkRBM01U
+       TXcKTnpBek1EaGFNSEl4Q3pBSkJnTlZCQVlUQWxKVk1STXdFUVlEVlFRSURBcExhR0ZpWVhKdmRu
+       TnJNUk13RVFZRApWUVFIREFwTGFHRmlZWEp2ZG5Ock1Rd3dDZ1lEVlFRS0RBTkVSMVF4RERBS0Jn
+       TlZCQXNNQTA5eVp6RWRNQnNHCkExVUVBd3dVZFdKMWJuUjFMVEF3TVM1a1ozUXViRzlqWVd3d2dn
+       SWlNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0SUMKRHdBd2dnSUtBb0lDQVFDcnRPdlJaYjd5dkpocTdI
+       UnRHZ05yRVJHMGIzaGp1WXZNSTRGRVVybjBCMFM0UkVJdwpjVE9XNWgwM3hWNUQzeURqWnowZ0Jz
+       VVFoUWJRRjZhbGQydk44VlNpbDFOMlhjdHJBUTdSeXB6THp2Vk5WbmgxCmpjMytLVGtPY1BJWmRt
+       SzU3eE9WNmFOYm4vZ1NBVmdOSVNkZUoraFhkZ1NJRDlNcHVnWmZYL1pDdHZQTWd4YUYKcE5zUnRT
+       dHZ2ZmhWdkxKaGpXRGVjb1lxaXJUTm9ZYndLdDZoL3YwMFhSYWxweFpUZDArc0tTYlFJZGR6YjhM
+       Mgp3TzJLak1ORVJWakdPYWUyM1VML2x5ZWZqd0kxblczWEhZSTdVaE1OOFhoVWxkZURyNEc5NndI
+       aXl4WUZDQWNrCi9GTHNGTjViY2VFR2VYVkxFV0JYK1VtYkFwclN1VzYyU3pLYnp6OVhrYjBMSDNI
+       NkpkZU1qTDAwMWhvL0J3L1gKUUNMaGl4NUw4TlhpRnlHVktjUXNCYWZNN3RDNnl0QW9Ucnc2ZTdk
+       M3YxWXQ4RFduVGNydk9SbFlTM0xyUENFVQpIVW1KZUNxYTF2blV0U0tKM3ppRE1HVkVNSWFiNXNi
+       blF4TU5ad1JmU0k2d3FOYlBIbzBiTFlXbDE1UnFHWlRkCm5Hc1BGL3pGbTd2SGFGWUh3U0NyR2pU
+       azg1V2xEL0FNZzVBZnhLemI4blNXWWlWUklONzlkVnVvY2R5aTh1dFYKYXZURVErbHl2R2ZLVzlC
+       M3Zjc2FQajBaVmgyUS8rVThWNlhIbUxQdHlYZEJEaFlRbkk3bTNoVFJZWVptVnM4RApVZTc4T0Zi
+       U2UwMWtyQy9Yc3kxQmlmUTFIdCt1MnRyTUFLUi9ndjZwWTh4S2hnWmtXdUtZWFB0REx3SURBUUFC
+       Cm8xTXdVVEFkQmdOVkhRNEVGZ1FVWmVLTU1aQ1J3WlhYVnd1a0FoNC9IS2VzWUlBd0h3WURWUjBq
+       QkJnd0ZvQVUKWmVLTU1aQ1J3WlhYVnd1a0FoNC9IS2VzWUlBd0R3WURWUjBUQVFIL0JBVXdBd0VC
+       L3pBTkJna3Foa2lHOXcwQgpBUXNGQUFPQ0FnRUFiZXM4WjBtK2hoajVxQ1FpRDYwN3VGcEM0Z2Y4
+       YjNQdk5JWVUvMFRZeE5VeW8vSk9laFoxCmphK2MyMCtpajMrTyt3enNiaXR2UUZtSVErNFJmcDB5
+       ckx2cjhrRy8vbUZ0NU1zUW1sNnBycitPVWkyWW9LckkKQnhkRnZ1Mnk2am8vanVKOGdhT1BHajJs
+       VTBML2thbU12UFBQYTlaanpacG1XeXpqWUs4YlBWNGNSVURjb3pVRwpWV05QVG5GYkdLYXp1L2dj
+       aXNJcXFSMVU2RG1KYUgvUjlJNms4cm9USHdnMEI1aGNvL2dLV1g2cnJ5dEQzVlA3CkZZWVBhUmw5
+       U0UrS3FDZE5OMXFqcWgxMTRsc0h6MWUzY0hWcHV3M2hVUTRldDlCdzFCWE5rbXJJRFljUVFDKzkK
+       NlA1S3U2LzBhTk55ZkJnZGl5RG8xK3BMNkNRMnVSdVcxZk13KzcrTzUrWlh5dllMRzVoTXV0SkNR
+       Tk50ZnNHTQpPdm50NWExOW5zaWRpdkgxd2tCVkZKWEtLZWJTUmRyTXVnM1JKeW9jYk1sK3l0d3F0
+       bW5OWnRxVU8zTW4xb0tDCitOV1IvTWFNaFhTNlNodDkwRmZTWkUrQmlJc3VnUkJzRkFoZUhoWEI2
+       cmgwd0g0SG9jOVV4ZlFDUlAzRm5mbEkKRE50VG43UEw3YXkzNEtCY3hIR1Jjb0xFNDY5V2ZUOGlT
+       b3EzVzNSci9mOGwzeml2Wm56dm1YWEV1Sk8xd2ZhNwpDQTQ2d0syTkRTL25NazBSUXNJWWVoUzNl
+       cFRucUZYZjM0VVMvR1BYOWRiTlRoejM4SjBFREJVSzJ1TXdla0VSCkcyV0RiQk9TQTlCYjRsRjdE
+       aG4vQ05wUkZOalBzcHVWbENyZHRYNVZ6WkY1Y0xjOTlmQzFUeDQ9Ci0tLS0tRU5EIENFUlRJRklD
+       QVRFLS0tLS0K
+     tls.key: |
+       LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRd0lCQURBTkJna3Foa2lHOXcwQkFRRUZB
+       QVNDQ1Mwd2dna3BBZ0VBQW9JQ0FRQ3J0T3ZSWmI3eXZKaHEKN0hSdEdnTnJFUkcwYjNoanVZdk1J
+       NEZFVXJuMEIwUzRSRUl3Y1RPVzVoMDN4VjVEM3lEalp6MGdCc1VRaFFiUQpGNmFsZDJ2TjhWU2ls
+       MU4yWGN0ckFRN1J5cHpMenZWTlZuaDFqYzMrS1RrT2NQSVpkbUs1N3hPVjZhTmJuL2dTCkFWZ05J
+       U2RlSitoWGRnU0lEOU1wdWdaZlgvWkN0dlBNZ3hhRnBOc1J0U3R2dmZoVnZMSmhqV0RlY29ZcWly
+       VE4Kb1lid0t0NmgvdjAwWFJhbHB4WlRkMCtzS1NiUUlkZHpiOEwyd08yS2pNTkVSVmpHT2FlMjNV
+       TC9seWVmandJMQpuVzNYSFlJN1VoTU44WGhVbGRlRHI0Rzk2d0hpeXhZRkNBY2svRkxzRk41YmNl
+       RUdlWFZMRVdCWCtVbWJBcHJTCnVXNjJTektieno5WGtiMExIM0g2SmRlTWpMMDAxaG8vQncvWFFD
+       TGhpeDVMOE5YaUZ5R1ZLY1FzQmFmTTd0QzYKeXRBb1RydzZlN2QzdjFZdDhEV25UY3J2T1JsWVMz
+       THJQQ0VVSFVtSmVDcWExdm5VdFNLSjN6aURNR1ZFTUlhYgo1c2JuUXhNTlp3UmZTSTZ3cU5iUEhv
+       MGJMWVdsMTVScUdaVGRuR3NQRi96Rm03dkhhRllId1NDckdqVGs4NVdsCkQvQU1nNUFmeEt6Yjhu
+       U1dZaVZSSU43OWRWdW9jZHlpOHV0VmF2VEVRK2x5dkdmS1c5QjN2Y3NhUGowWlZoMlEKLytVOFY2
+       WEhtTFB0eVhkQkRoWVFuSTdtM2hUUllZWm1WczhEVWU3OE9GYlNlMDFrckMvWHN5MUJpZlExSHQr
+       dQoydHJNQUtSL2d2NnBZOHhLaGdaa1d1S1lYUHRETHdJREFRQUJBb0lDQUFGVnV6MmFBbVdGdE5P
+       aitmVzlMWWlnCkRkaXV3eXRYVG5Cc1dEMXRQVGZaOUoxUUhvbWMzNjlOSTY0QzBVeEt5RWtzVE12
+       YWNaN0N3ZjVOS01VQmpDdUMKTkV1OVRHOVBwRnkxR2VYa290cHN4Zmh2Y3lsS3pHNnM2RjRsMzZQ
+       MkNTZHo1ZDJVL3VtZjhVQkdsV1lvdTFNZQprVTVZd3dsQndqMEJUcnBnRnh5R3FwZU03MWhqb3pa
+       Y2g3VnJMeXFQZUgyTXFWT2haVXlnWG01NDBvRThmQldiClUyR2NWYWc5QjgzblVBM0JGaVdwRmJF
+       MmpiZjRZUUJpUHNSaG02S1M0U3hwUlBPU3U4S2dUSDZaTmpqbGFGVkkKdXBBeHIrTk1kT3YzcWRV
+       TnBpcWF0SldlYmR2S1FHVElkc0FVUHhFYlVaK2ZSM1gzb0t4ZFZWSE5Fa0RGamVPbgo2b2h3RStT
+       eWJwR0R4dmhZTU84eWFqdjRpWHhxKy9FTm85WmhYdEYwRTRnM3FWZWJ4UXJlV0poQVA4YmJUcHN2
+       CkZLY1hSMUMrR3lSbWhGUmxjS1FqQm1iTTBFaFJkd0piekhpd2hTYVJFcEo3NGx3MW9sKy9hTTA1
+       cGttZkUxYTQKbnVCNFhCcDE5cUJTU0xRZ3Y3NDRlcDkzQmMzN2lIdjI2ZG5BNnBzSFNNbEliR2cx
+       NStMQ0cra0x1U3RHYzBOYQpvNVZMSFd4N1dvcC93TndWN0owaENhVU9FWkk0SGI1N1lIdmQ0WTdS
+       VWdRUmxUcHhaaXF6VHREWGlNVzZiYTdRCjN6aGdGZHZPNXdUaUY1U2sxSkpzajk2T1RZNWZjWXl1
+       dWxqbFZXc0pwMlJDUGFTb3lzR2hFTDV1ZTIrNk9vTE4KVW5Kd1FHeEJRdDdhZjlNbkVNNVJBb0lC
+       QVFDMk1XWk5yUFFRY1NqV1FmVWFCcHlHU1EwajFCTEs2bmtyMVNabQpJRGo0ci80NzQ4QnNaeFgr
+       clI1VVFHOXowZEVGWmRVd1V0ZXM3NUp3SXFMMDhxa0xnQ0hDeDZWSXBlV2RsL1BaCmFzNEVpMXJl
+       MjVCYlJRVmdyMVFOYXFOazdwMFNKYTg3RG5iT0ljYTZqRmYxczRrTHgxbGpQcU95YklSNFlrZE4K
+       d0RCdlBIN0VvN0ZYTkoyNW9HUnh1Y1pWUzFLajQvcEVGR3RPQURqb3hYTFp1RVhmMHFGZWpOZVMr
+       OGZSbWFoVgplWS95cEpxN3VSV0xTSVpRcG1oZ2tRa0pGK1p4UlIwRDJzeVhBMUpnQWVGSWwwczVX
+       Q0ZyNURqc1pJVFRtSnJ1ClNzdW9nZ3crTlRrOWlYZitYRHQzRkExTTdjbjBwR0JETnBYNWUraHcx
+       UnJENXpBUkFvSUJBUUR4UkFlUnh0aFcKK000Zld6N3Zic3prMUVSWGtyYm9HZjJQVXk5OGlvbkV3
+       MWVGMXJ6d21wV1V0Z2NQeTdaTS9jTE9GRC9jY0J1RAo1WnR4ZzZtV1NJL0RVaGIrdFpFZjE3dVF6
+       REJxYTQ4K3R3K2V0dGN6UzBPeHF6K1ZSWVRBeE5MVk1vMUR1cG5LCkZSd0lDcHJMV3d2YU14ZHNG
+       dW9iQUF6UGJmRTdkbmVnQWVMUjczZTRackpBWjd2bk5nWU8ySjd6bUczRUg0M3MKTURqN1g3YnVz
+       YTJjYy9vdjBLZTBVUjRNMVZJaDRaRWxMQ3VYcHZ1WFErbDB3REM4cWoxQlNLdGRMVjlRckZYdgpm
+       MkY2WHUzREd1cFVQOHU5WTRyV0lTT1lleFBKSlpVMXRXQWQxNnlpSUtxZ00wK2FHNDNoa1lNa3Rs
+       cmRVMkRNClNoekR4dEhRWG44L0FvSUJBUUNGSEs2TURkTDd1RkdIeVFUVWtRUUhNSlJER3d6bjZF
+       dkRkS1hyYzV0c1J0bE8KMUdXZ1RlakorNTN2SEd6UmgvaFpJeitSWU5WbTZscHBSMFVjQmJid1No
+       dGdmaEVLZFByQUcyYno4STY0ejBBRApGeFB2T3d4a3lYUjFvUFhrSmxub0NsUnVwM0N4eGdlMkFC
+       ZTcwZ0pNOHNjaU5YL1FPbXpHcjdjODNUQUY5WU1CCkZEL2JZUHZqeFlYZGVVZW94YkdKUUdWM0hC
+       d1NEeU9GSGMxOXVKNkVteFYvU1JPdnRma1Y4RmdHcXh3NndYeXoKcnRSSXdTSXhCb080R2Y4cC82
+       WkVGNlROVGl5d0lLTXN0ZkxzNEd6N1pxSjBlM2dEYnFXRkd6Z0c1ZXJLSU1ubApJV25DeGc4L2Jn
+       K2NQckJCQm5MSkpOZVlBK2VyTVpadjZhTDJncENoQW9JQkFRQ3JIUlhGUldOUW85d0ZEMEVlCnJk
+       WHlBYjZLNGNxSjZVMFZwdWtLQ25QVnNyblRlYzY5VXRYK0IvQVFPdW9MeHZxd0VGcU9ySkJIUnNT
+       dGlMVHgKbW5za0M0ZTFsTzdkeDdNRzZscjRUMXJrSHcrY0FJKzJtSTNsWjlDTHZTZC9WTmszVGtn
+       MG5oYk81WlBnL0N4MwpTQmFxNWd1WnBOTGEzWGs0Y1FCanJRMEExZldaOFo1V2tiZWd5REhUdFZR
+       c21XUjYza1FUa2xHbER6cUt4b0xHCjNndUU2QmlzYXU5V2l5V2w4bkh6QjdsYXhPNFIrK042a0Ri
+       MmtBekE4bmpKWVpId1h1cTRHOUpETDNQaVI0dVkKRWZIYVdQaldWTkEyT0lDM2Q2czd3VVVITjZG
+       NDZPdE9mWjZtU2w0TnJiYytJV2NDMWJheVBKMXRwcTZxQjh2dApYZWdmQW9JQkFBaGpXTWpjKzJZ
+       RXlmeUx0RHNGRzU5RHZteTZ0MzZ2cjNQaXQ4Ly8rb3BFV3RnOWh0eUY0SStlCnkrS2FoaC9kOEVx
+       YTRuKzNjYjB6OC9NaE5nWmNJZVNCWU9BaFVzcE45eXNjK2wzZkY2YTNkZzhLbDdiRkxMZCsKTmFL
+       Nm5pWkh0clFYMWUwRk1sUjZDSU9KOG9ZZ2pTRWdHcjJKUTRNRmdDbmNBTkMxOUZ5UmdHM3duN2Vu
+       ajFLRgpQRS9DbWU5VDdPRlRncVdUdWR5L3ZRaGMvcFZBNEl2K0JwNjJFN2lLbk14ZjcyTE9PMkVi
+       Y3p6bXZUN2ErUlYrCk5Xa3pwU2t1ckJwcmF6dEUzUlB5cnNwQjJjZ3JKUzhNUXdXNlV0Um1RaEFZ
+       a3pjdjIzVE5hUEhEdkM4OTRtUFIKZHAvckREVStoUHhWRm0wb0d5N2FBaHVtdUFXTWJlbz0KLS0t
+       LS1FTkQgUFJJVkFURSBLRVktLS0tLQo=
+   ```
+
+------
+
+

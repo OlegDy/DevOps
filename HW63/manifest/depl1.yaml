@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: multitool-dep
+  name: multitool-dep
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: multitool
+  template:
+    metadata:
+      labels:
+        app: multitool
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+      - name: multitool
+        image: wbitt/network-multitool:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: HTTP_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: depl1-cfgmap
+              key: http-port
+        - name: HTTPS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: depl1-cfgmap
+              key: https-port
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: depl1-cfgmap
+data:
+  http-port: "8080"
+  https-port: "11443"
